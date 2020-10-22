@@ -6,6 +6,7 @@ import water.util.UnsafeUtils;
 import water.fvec.*;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
@@ -299,7 +300,37 @@ final public class Key<T extends Keyed> extends Iced<Key<T>> implements Comparab
   public static <P extends Keyed> Key<P> makeUserHidden(String s) {
     return make(s,DEFAULT_DESIRED_REPLICA_FACTOR,HIDDEN_USER_KEY, false);
   }
-
+  
+  /** Factory making an random Key from two Strings
+   * 
+   * @param prefix - prefix of the new key. Should not be null. If it contains non-word characters, 
+   *               they are converted to underscores.
+   * @param postfix - postfix of the new key. Should not be null. If it contains non-word characters,
+   *                they are converted to underscores.
+   *
+   *  @return Desired Key that looks like prefix_RANDOM_postfix 
+   */
+  public static <P extends Keyed> Key<P> makeRandom(final String prefix, final String postfix) {
+    Objects.requireNonNull(prefix);
+    Objects.requireNonNull(postfix);
+    
+    final String s = prefix + "_" + rand()  + (postfix.isEmpty() ? "" : ("_" + postfix));
+    final String withoutWhitechars = s.replaceAll("\\W", "_");
+    
+    return make(decodeKeyName(withoutWhitechars));
+  }
+  
+  /** Factory making an random Key from one String
+   * 
+   * @param prefix - prefix of the new key. Should not be null. If it contains non-word characters, 
+   *               they are converted to underscores.
+   *
+   *  @return Desired Key that looks like prefix_RANDOM 
+   */
+  public static <P extends Keyed> Key<P> makeRandom(final String prefix) {
+    return makeRandom(prefix, "");
+  }
+  
   /**
    * Make a random key, homed to a given node.
    * @param node a node at which the new key is homed.

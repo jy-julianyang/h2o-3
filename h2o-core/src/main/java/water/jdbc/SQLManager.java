@@ -46,7 +46,7 @@ public class SQLManager {
       final Boolean useTempTable, final String tempTableName,
       final SqlFetchMode fetchMode, final Integer numChunksHint) {
 
-    final Key<Frame> destination_key = Key.make((table + "_sql_to_hex").replaceAll("\\W", "_"));
+    final Key<Frame> destination_key = Key.makeRandom(table, "sql_to_hex");
     final Job<Frame> j = new Job<>(destination_key, Frame.class.getName(), "Import SQL Table");
 
     final String databaseType = getDatabaseType(connection_url);
